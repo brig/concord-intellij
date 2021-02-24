@@ -7,7 +7,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.psi.*;
 
+import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.*;
@@ -106,7 +108,14 @@ public class ProcessDefinition {
             return FileSystems.getDefault().getPathMatcher(normalizedPattern);
         }
 
-        return null;
+        Path singleFilePattern = baseDir.resolve(pattern);
+        return path -> {
+            try {
+                return Files.isSameFile(singleFilePattern, path);
+            } catch (IOException e) {
+                return false;
+            }
+        };
     }
 
     private static String concat(Path path, String str) {

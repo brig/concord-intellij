@@ -355,6 +355,13 @@ public class SchemaProvider {
                 .description("imports arr descr")
                 .build();
 
+        Schema resources = ObjectSchema.builder()
+                .property("concord", ArraySchema.withItem(StringSchema.builder()
+                            .description("Resource pattern description").build())
+                        .description("Resources array description")
+                        .build(), true)
+                .build();
+
         return ObjectSchema.builder()
                 .property("configuration", cfg)
                 .property("publicFlows", publicFlows)
@@ -363,7 +370,7 @@ public class SchemaProvider {
 //                .property("triggers", triggers)
 //                .property("profiles", profiles)
 //                .property("forms", forms)
-//                .property("resources", resources)
+                .property("resources", resources)
                 .build();
     }
 

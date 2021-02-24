@@ -1,4 +1,3 @@
-- grammar for resources;
 - grammar for triggers;
 - grammar for forms;
 - grammar for profiles;

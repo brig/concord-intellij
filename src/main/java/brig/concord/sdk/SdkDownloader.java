@@ -52,7 +52,7 @@ public class SdkDownloader implements SdkDownload {
     @Override
     public void showDownloadUI(@NotNull SdkTypeId sdkTypeId, @NotNull SdkModel sdkModel, @NotNull JComponent parentComponent, @Nullable Sdk selectedSdk, @NotNull Consumer<SdkDownloadTask> sdkCreatedCallback) {
         Project project = CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext(parentComponent));
-        if (project == null || project.isDisposed()) {
+        if (project != null && project.isDisposed()) {
             return;
         }
 
@@ -63,7 +63,7 @@ public class SdkDownloader implements SdkDownload {
             log.warn("Failed to download the list of SDKs. {}", e);
         }
 
-        if (project.isDisposed()) {
+        if (project != null && project.isDisposed()) {
             return;
         }
 

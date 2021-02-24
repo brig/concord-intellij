@@ -1,6 +1,7 @@
 package brig.concord.run;
 
 import brig.concord.ConcordBundle;
+import brig.concord.sdk.ConcordSdkType;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.executors.DefaultDebugExecutor;
@@ -9,6 +10,7 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizable;
 import com.intellij.openapi.util.WriteExternalException;
@@ -29,11 +31,14 @@ public class ConcordCliRunConfiguration extends LocatableConfigurationBase {
         super(project, factory, name);
 
         setAllowRunningInParallel(false);
+
+        settings.setProcessEntryPoint("default");
+        settings.setProcessSdk(getProjectSdkName(project));
     }
 
     @Override
     public RunConfiguration clone() {
-        final ConcordCliRunConfiguration configuration = (ConcordCliRunConfiguration) super.clone();
+        ConcordCliRunConfiguration configuration = (ConcordCliRunConfiguration) super.clone();
         configuration.settings = settings.copy();
         return configuration;
     }
@@ -115,6 +120,14 @@ public class ConcordCliRunConfiguration extends LocatableConfigurationBase {
         } else {
             settings.setProcessSdk(sdk.getName());
         }
+    }
+
+    private static String getProjectSdkName(Project project) {
+        Sdk sdk = ProjectRootManager.getInstance(project).getProjectSdk();
+        if (ConcordSdkType.isConcordSdk(sdk)) {
+            return sdk.getName();
+        }
+        return null;
     }
 
     public static class CliRunSettings implements JDOMExternalizable {
