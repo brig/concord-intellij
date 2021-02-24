@@ -1,0 +1,59 @@
+<idea-plugin>
+    <id>brig.concord.concord-intellij</id>
+    <name>Concord</name>
+    <vendor email="ybrigo@gmail.com" url="https://github.com/brig">Yury Brigadirenko</vendor>
+
+    <description>
+        <![CDATA[
+     <p>A plugin to help you easily edit Concord YAML files.</p>
+    ]]>
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Concord" implementationClass="brig.concord.language.ConcordFileType"
+                  fieldName="INSTANCE" language="yaml"
+                  extensions="concord.yml" patterns="*.concord.yml;concord.yml"/>
+
+        <moduleType id="CONCORD_MODULE" implementationClass="brig.concord.module.ConcordModuleType"/>
+
+        <sdkType implementation="brig.concord.sdk.ConcordSdkType"/>
+        <sdkDownload implementation="brig.concord.sdk.SdkDownloader" />
+        <applicationService serviceImplementation="brig.concord.sdk.SdkListDownloader"/>
+        <applicationService serviceImplementation="brig.concord.sdk.SdkInstaller"/>
+
+        <configurationType implementation="brig.concord.run.ConcordCliRunConfigurationType"/>
+        <programRunner implementation="brig.concord.run.ConcordCliRunner"/>
+        <runConfigurationProducer implementation="brig.concord.run.ConcordCliRunContextConfigurationProducer"/>
+        <runLineMarkerContributor language="yaml" implementationClass="brig.concord.run.ConcordCliRunLineMarkerContributor"/>
+
+        <documentationProvider order="first" implementation="brig.concord.documentation.ConcordDocumentationProvider" />
+        <completion.contributor language="yaml" implementationClass="brig.concord.completion.ConcordYamlCompletionContributor" />
+        <psi.referenceContributor language="yaml" implementation="brig.concord.reference.ConcordReferenceContributor" />
+        <enterHandlerDelegate order="first" implementation="brig.concord.smart.ConcordYAMLEnterHandler" />
+
+        <internalFileTemplate name="concord.yml"/>
+
+        <referencesSearch implementation="brig.concord.search.FlowDefinitionSearch"/>
+
+        <annotator language="yaml" implementationClass="brig.concord.codeinsight.UnknownPropertyAnnotator" />
+        <annotator language="yaml" implementationClass="brig.concord.codeinsight.ValueTypeCheckerAnnotator" />
+        <annotator language="yaml" implementationClass="brig.concord.codeinsight.MissingRequiredPropertiesAnnotator" />
+
+        <intentionAction>
+            <className>brig.concord.codeinsight.action.AddStepNameAction</className>
+        </intentionAction>
+<!--        Not working:(-->
+<!--        <breadcrumbsInfoProvider implementation="brig.concord.breadcrumbs.DebugBreadcrumbsProvider"/>-->
+    </extensions>
+
+    <actions>
+        <action id="ConcordPlugin.CreateConcordFile" class="brig.concord.actions.CreateConcordFile" text="Concord YAML File"
+                description="Create a Concord YAML file">
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewFile"/>
+        </action>
+    </actions>
+</idea-plugin>

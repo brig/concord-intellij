@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.7.2'
+}
+
+group 'brig.concord'
+version '0.0.1-SNAPSHOT'
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.immutables:value-annotations:2.8.8'
+    annotationProcessor 'org.immutables:value:2.8.8'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+intellij {
+    version '2020.3'
+
+    plugins = ["yaml", "com.intellij.java"]
+}
+
+patchPluginXml {
+    version = project.version
+    sinceBuild = '203'
+}
+
+test {
+    useJUnitPlatform()
+}
