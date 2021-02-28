@@ -5,6 +5,7 @@ import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.ConfigurationFromContext;
 import com.intellij.execution.actions.LazyRunConfigurationProducer;
 import com.intellij.execution.configurations.ConfigurationFactory;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -23,7 +24,9 @@ public class ConcordCliRunContextConfigurationProducer extends LazyRunConfigurat
             return null;
         }
 
-        return new RunParams(flowName, workingDir);
+        Sdk sdk = ConcordCliRunConfiguration.defaultSdk(context.getProject()).orElse(null);
+        String jre = ConcordCliRunConfiguration.defaultJre(context.getProject()).map(Sdk::getName).orElse(null);
+        return new RunParams(flowName, workingDir, sdk, jre);
     }
 
     private static String getWorkingDirectory(PsiElement element) {
@@ -65,6 +68,8 @@ public class ConcordCliRunContextConfigurationProducer extends LazyRunConfigurat
         configuration.setName(params.flowName());
         configuration.setProcessEntryPoint(params.flowName());
         configuration.setProcessWorkDir(params.workingDir());
+        configuration.setProcessSdk(params.sdk());
+        configuration.setJrePath(params.jre());
     }
 
     @Nullable
@@ -77,10 +82,14 @@ public class ConcordCliRunContextConfigurationProducer extends LazyRunConfigurat
 
         private final String flowName;
         private final String workingDir;
+        private final Sdk sdk;
+        private final String jre;
 
-        private RunParams(String flowName, String workingDir) {
+        private RunParams(String flowName, String workingDir, Sdk sdk, String jre) {
             this.flowName = flowName;
             this.workingDir = workingDir;
+            this.sdk = sdk;
+            this.jre = jre;
         }
 
         public String flowName() {
@@ -89,6 +98,14 @@ public class ConcordCliRunContextConfigurationProducer extends LazyRunConfigurat
 
         public String workingDir() {
             return workingDir;
+        }
+
+        public Sdk sdk() {
+            return sdk;
+        }
+
+        public String jre() {
+            return jre;
         }
     }
 }

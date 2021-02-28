@@ -42,4 +42,9 @@ public class ConcordCliRunConfigurationType implements ConfigurationType {
     public ConfigurationFactory[] getConfigurationFactories() {
         return new ConfigurationFactory[]{new ConcordConfigurationFactory(this)};
     }
+
+    @Override
+    public boolean isDumbAware() {
+        return true;
+    }
 }

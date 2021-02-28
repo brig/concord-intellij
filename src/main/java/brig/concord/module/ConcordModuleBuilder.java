@@ -39,11 +39,6 @@ public class ConcordModuleBuilder extends ModuleBuilder implements ModuleBuilder
     @Nullable
     @Override
     public ModuleWizardStep modifySettingsStep(@NotNull SettingsStep settingsStep) {
-        return new SdkSettingsStep(settingsStep, this, new Condition<SdkTypeId>() {
-            @Override
-            public boolean value(SdkTypeId sdkType) {
-                return ConcordModuleBuilder.this.isSuitableSdkType(sdkType);
-            }
-        });
+        return new SdkSettingsStep(settingsStep, this, ConcordModuleBuilder.this::isSuitableSdkType);
     }
 }

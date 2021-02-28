@@ -1,8 +1,9 @@
+- replace ConcordCliRunConfigurationForm.SdkComboBox with SdkChooserField; 
+- remote SDK
 - grammar for triggers;
 - grammar for forms;
 - grammar for profiles;
 - show combined yaml in "structure view";
-- move strings into bundle;
 - imports;
 - task name autocomplete + dependencies;
 - scrip engine autocomplete + dependencies;

@@ -49,7 +49,7 @@ public class ConcordModuleType extends ModuleType<ConcordModuleBuilder> {
     }
 
     @Override
-    public boolean isValidSdk(@NotNull Module module, final @Nullable Sdk projectSdk) {
+    public boolean isValidSdk(@NotNull Module module, @Nullable Sdk projectSdk) {
         return projectSdk != null && projectSdk.getSdkType().equals(ConcordSdkType.getInstance());
     }
 }

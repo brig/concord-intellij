@@ -33,4 +33,9 @@ public class ConcordConfigurationFactory extends ConfigurationFactory {
     String getId() {
         return FACTORY_NAME;
     }
+
+    @Override
+    public boolean isEditableInDumbMode() {
+        return true;
+    }
 }

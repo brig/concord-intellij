@@ -1,16 +1,21 @@
-package brig.concord.run;
+package brig.concord.run.ui;
 
 import brig.concord.ConcordBundle;
+import brig.concord.run.ConcordCliRunConfiguration;
+import brig.concord.run.ProcessArgument;
 import brig.concord.sdk.ConcordSdkType;
 import com.intellij.execution.util.ListTableWithButtons;
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ui.configuration.SdkComboBox;
 import com.intellij.openapi.roots.ui.configuration.SdkComboBoxModel;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel;
+import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.ColumnInfo;
@@ -24,12 +29,16 @@ import java.util.stream.Collectors;
 
 public class ConcordCliRunConfigurationForm {
 
+    private JTextField processEntryPoint;
     private final ProcessArgumentsTable processArguments;
-    private final SdkComboBox sdk;
-    private JPanel rootPanel;
     private JTextField processProfiles;
     private TextFieldWithBrowseButton workingDirectory;
-    private JTextField processEntryPoint;
+//    private final SdkComboBox sdk;
+    private RawCommandLineEditor sdkOptions;
+    private JreChooserField jreChooserField;
+    private RawCommandLineEditor vmOptions;
+    private JPanel rootPanel;
+    private final SdkComboBox sdkChooserField;
 
     public ConcordCliRunConfigurationForm(ConcordCliRunConfiguration runConfiguration) {
         this.processArguments = new ProcessArgumentsTable();
@@ -39,16 +48,22 @@ public class ConcordCliRunConfigurationForm {
         argsConstraints.setFill(3);
         this.rootPanel.add(this.processArguments.getComponent(), argsConstraints);
 
+        this.workingDirectory
+                .addBrowseFolderListener(ConcordBundle.message("dialog.title.working.directory"), null,
+                runConfiguration.getProject(),
+                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+
         ProjectSdksModel sdksModel = new ProjectSdksModel();
         sdksModel.syncSdks();
 
-        SdkComboBoxModel model = SdkComboBoxModel.createSdkComboBoxModel(runConfiguration.getProject(), sdksModel, sdkTypeId -> sdkTypeId == ConcordSdkType.getInstance(), sdkTypeId -> sdkTypeId == ConcordSdkType.getInstance(), sdk -> sdk.getSdkType() == ConcordSdkType.getInstance());
-        this.sdk = new SdkComboBox(model);
+        SdkComboBoxModel modelSdk = SdkComboBoxModel.createSdkComboBoxModel(runConfiguration.getProject(), sdksModel, sdkTypeId -> sdkTypeId == ConcordSdkType.getInstance(), sdkTypeId -> sdkTypeId == ConcordSdkType.getInstance(), sdk -> sdk.getSdkType() == ConcordSdkType.getInstance());
+        this.sdkChooserField = new SdkComboBox(modelSdk);
         GridConstraints sdkConstraints = new GridConstraints();
         sdkConstraints.setColumn(1);
         sdkConstraints.setRow(4);
         sdkConstraints.setFill(3);
-        this.rootPanel.add(this.sdk, sdkConstraints);
+        this.rootPanel.add(this.sdkChooserField, sdkConstraints);
     }
 
     public JComponent getRootPanel() {
@@ -99,16 +114,41 @@ public class ConcordCliRunConfigurationForm {
     }
 
     public Sdk getProcessSdk() throws ConfigurationException {
-        WriteAction.run(() -> sdk.getModel().getSdksModel().apply());
-        return sdk.getSelectedSdk();
+        WriteAction.run(() -> sdkChooserField.getModel().getSdksModel().apply());
+        return sdkChooserField.getSelectedSdk();
+//        return null;
     }
 
     public void setProcessSdk(Sdk sdk) {
         if (sdk == null) {
-            this.sdk.setSelectedItem(this.sdk.showNoneSdkItem());
+            this.sdkChooserField.setSelectedItem(this.sdkChooserField.showNoneSdkItem());
         } else {
-            this.sdk.setSelectedSdk(sdk);
+            this.sdkChooserField.setSelectedSdk(sdk);
         }
+    }
+
+    public String getSdkOptions() {
+        return sdkOptions.getText();
+    }
+
+    public void setSdkOptions(String options) {
+        sdkOptions.setText(options);
+    }
+
+    public String getJrePath() {
+        return jreChooserField.getJrePathOrName();
+    }
+
+    public void setJrePath(String path) {
+        jreChooserField.setPathOrName(path);
+    }
+
+    public String getVmOptions() {
+        return vmOptions.getText();
+    }
+
+    public void setVmOptions(String options) {
+        vmOptions.setText(options);
     }
 
     static class ProcessArgumentsTable extends ListTableWithButtons<ProcessArgument> {
