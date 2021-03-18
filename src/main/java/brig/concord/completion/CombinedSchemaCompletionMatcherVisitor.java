@@ -59,7 +59,11 @@ public class CombinedSchemaCompletionMatcherVisitor extends SchemaMatcherVisitor
         }
 
         if (!partialMatch.isEmpty()) {
-            this.schema = CombinedSchema.oneOf(partialMatch).id(schema.id()).build();
+            if (partialMatch.size() == 1) {
+                this.schema = partialMatch.get(0);
+            } else {
+                this.schema = CombinedSchema.oneOf(partialMatch).id(schema.id()).build();
+            }
         }
     }
 

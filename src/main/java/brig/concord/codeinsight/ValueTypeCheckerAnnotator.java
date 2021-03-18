@@ -30,10 +30,15 @@ public class ValueTypeCheckerAnnotator implements Annotator {
 
         Schema valueSchema = ConcordYamlPsiUtils.schema(schemaProvider, element);
         if (valueSchema != null) {
+            YAMLValue value;
             if (ConcordYamlPsiUtils.isNullValue(element)) {
-                TypeCheckVisitor visitor = new TypeCheckVisitor(null, annotationHolder);
-                visitor.visit(valueSchema);
+                value = null;
+            } else {
+                value = ConcordYamlPsiUtils.asValue(element);
             }
+
+            TypeCheckVisitor visitor = new TypeCheckVisitor(value, annotationHolder);
+            visitor.visit(valueSchema);
             return;
         }
 

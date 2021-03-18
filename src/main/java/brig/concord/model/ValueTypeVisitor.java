@@ -56,6 +56,9 @@ public class ValueTypeVisitor extends Visitor {
             case STRING:
                 this.types.add(ValueTypes.STRING);
                 break;
+            case INT:
+                this.types.add(ValueTypes.INT);
+                break;
             default:
                 throw new RuntimeException("Unknown type: " + schema.valueType());
         }

@@ -18,6 +18,7 @@ public class SchemaProvider {
     public static final String TASK_DEF_ID = "taskStepDef";
 
     public static final SchemaProvider INSTANCE = new SchemaProvider();
+
     private final Schema root = buildSchema();
 
     public static SchemaProvider getInstance() {
@@ -61,6 +62,7 @@ public class SchemaProvider {
                 .property("mode")
                 .schema(CombinedSchema.oneOf(
                         ConstSchema.builder().value("cancel").description("cancel value descr").build(),
+                        ConstSchema.builder().value("cancelOld").description("cancelOld value descr").build(),
                         ConstSchema.builder().value("wait").description("wait value descr").build())
                         .description("combined mode descr")
                         .build())
@@ -108,7 +110,8 @@ public class SchemaProvider {
                 .anyObjectProperty("arguments", "Process default variables")
                 .anyObjectProperty("requirements", "Process requirements")
                 .anyObjectProperty("meta", "Process metadata")
-                .property("processTimeout", StringSchema.builder().description("processTimeout value descr").build()) // TODO: check value
+                .property("processTimeout", StringSchema.builder().description("processTimeout value descr").customType(ValueTypes.DURATION).build())
+                .property("suspendTimeout", StringSchema.builder().description("suspendTimeout value descr").customType(ValueTypes.DURATION).build())
                 .property("exclusive", exclusiveSchema)
                 .property("events", eventsSchema)
                 .property("out", ArraySchema.withItem(StringSchema.builder().description("out value descr").build()).description("out arr descr").build())
@@ -362,19 +365,130 @@ public class SchemaProvider {
                         .build(), true)
                 .build();
 
+        Schema repositoryInfoSchema = ObjectSchema.builder()
+                .description("repository info descr")
+                .property("repositoryId", regexp("repositoryId value descr"))
+                .property("repository", regexp("repository value descr"))
+                .property("projectId", regexp("projectId value descr"))
+                .property("branch", regexp("branch value descr"))
+                .property("enabled", BooleanSchema.builder().description("enabled value descr").defaultValue(true).build())
+                .build();
+
+        Schema githubExclusiveSchema = ObjectSchema.builder()
+                .description("github exclusive descr")
+                .property("group", StringSchema.builder().description("group value descr").build(), false)
+                .property("groupBy", ConstSchema.builder().value("branch").description("branch value descr").build(), false)
+                .property("mode")
+                .schema(CombinedSchema.oneOf(
+                        ConstSchema.builder().value("cancel").description("cancel value descr").build(),
+                        ConstSchema.builder().value("cancelOld").description("cancel value descr").build(),
+                        ConstSchema.builder().value("wait").description("wait value descr").build())
+                        .description("combined mode descr")
+                        .build())
+                .build()
+                .build();
+
+        Schema githubOrgValueSchema = regexp("githubOrg value descr");
+        Schema githubRepoSchema = regexp("githubRepo value descr");
+
+        Schema githubConditionsSchema = ObjectSchema.builder()
+                .description("github conditions descr")
+                .property("type", StringSchema.builder().description("type value descr").build(), true)
+                .anyObjectProperty("payload","payload value descr", false)
+                .property("githubOrg", CombinedSchema.oneOf(githubOrgValueSchema, ArraySchema.withItem(githubOrgValueSchema).description("array decr").build()).build())
+                .property("githubRepo", CombinedSchema.oneOf(githubRepoSchema, ArraySchema.withItem(githubRepoSchema).description("array decr").build()).build())
+                .property("githubHost", regexp("githubHost value descr"))
+                .property("branch", regexp("branch value descr"))
+                .property("sender", regexp("sender value descr"))
+                .property("status", regexp("status value descr"))
+                .property("repositoryInfo", ArraySchema.withItem(repositoryInfoSchema).description("array of repositoryInfo descr").build())
+                .build();
+
+        Schema githubTriggerParams = ObjectSchema.builder()
+                .description("github params description")
+                .property("version", ConstSchema.builder().value(2).description("version number").build(), true)
+                .property("entryPoint", flowName, true)
+                .property("useInitiator", BooleanSchema.builder().description("useInitiator value description").defaultValue(true).build(), false)
+                .property("activeProfiles", ArraySchema.withItem(profileName).description("activeProfiles array descr").build(), false)
+                .property("useEventCommitId", BooleanSchema.builder().description("useEventCommitId value description").defaultValue(true).build(), false)
+                .property("ignoreEmptyPush", BooleanSchema.builder().description("ignoreEmptyPush value description").defaultValue(true).build(), false)
+                .property("arguments", ObjectSchema.anyObject("arguments desct"), false)
+                .property("exclusive", githubExclusiveSchema, false)
+                .property("conditions", githubConditionsSchema, true)
+                .build();
+
+        Schema githubTrigger = ObjectSchema.builder()
+                .description("Github trigger definition")
+                .property("github", githubTriggerParams, true)
+                .build();
+
+        Schema cronTriggerParams = ObjectSchema.builder()
+                .property("spec", StringSchema.builder().description("cron value descr").customType("cron").build(), true)
+                .property("entryPoint", flowName, true)
+                .property("activeProfiles", ArraySchema.withItem(profileName).description("activeProfiles array descr").build())
+                .property("timezone", StringSchema.builder().description("timezone value descr").customType("timezone").build())
+                .property("exclusive", exclusiveSchema, false)
+                .property("arguments", ObjectSchema.anyObject("arguments desct"), false)
+                .build();
+
+        Schema cronTrigger = ObjectSchema.builder()
+                .description("Cron trigger definition")
+                .property("cron", cronTriggerParams, true)
+                .build();
+
+        Schema manualTriggerParams = ObjectSchema.builder()
+                .description("Manual trigger params")
+                .property("name", StringSchema.builder().description("name descr").build())
+                .property("entryPoint", flowName, true)
+                .property("activeProfiles", ArraySchema.withItem(profileName).description("activeProfiles array descr").build())
+                .property("arguments", ObjectSchema.anyObject("arguments descr"), false)
+                .build();
+
+        Schema manualTrigger = ObjectSchema.builder()
+                .description("Manual trigger definition")
+                .property("manual", manualTriggerParams, true)
+                .build();
+
+        Schema genericTriggerParams = ObjectSchema.builder()
+                .description("Generic trigger params")
+                .property("entryPoint", flowName, true)
+                .property("activeProfiles", ArraySchema.withItem(profileName).description("activeProfiles array descr").build())
+                .property("arguments", ObjectSchema.anyObject("arguments descr"), false)
+                .property("exclusive", exclusiveSchema, false)
+                .property("conditions", ObjectSchema.anyObject("conditions schema"), true)
+                .property("version", ConstSchema.builder().value(2).description("generic trigger version").build(), true)
+                .build();
+
+        Schema genericTrigger = ObjectSchema.builder()
+                .description("Generic trigger definition")
+                .additionalProperties(true)
+                .schemaOfAdditionalProperties(genericTriggerParams)
+                .build();
+
+        Schema triggers = ArraySchema.withItem(CombinedSchema.oneOf(githubTrigger, cronTrigger, manualTrigger, genericTrigger).description("One Of trigger descriptino").build())
+                .description("Triggers array description")
+                .build();
+
         return ObjectSchema.builder()
                 .property("configuration", cfg)
                 .property("publicFlows", publicFlows)
                 .property("flows", flows)
                 .property("imports", imports)
-//                .property("triggers", triggers)
+                .property("resources", resources)
+                .property("triggers", triggers)
 //                .property("profiles", profiles)
 //                .property("forms", forms)
-                .property("resources", resources)
                 .build();
     }
 
     public Schema get() {
         return root;
+    }
+
+    private static StringSchema regexp(String description) {
+        return StringSchema.builder()
+                .description(description)
+                .customType(ValueTypes.REGEXP)
+                .build();
     }
 }

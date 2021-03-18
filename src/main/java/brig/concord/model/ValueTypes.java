@@ -8,4 +8,6 @@ public class ValueTypes {
     public static final String INT = "int";
     public static final String OBJECT = "object";
     public static final String STRING = "string";
+    public static final String DURATION = "duration";
+    public static final String REGEXP = "regexp";
 }

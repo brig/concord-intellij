@@ -29,7 +29,3 @@ patchPluginXml {
     version = project.version
     sinceBuild = '203'
 }
-
-test {
-    useJUnitPlatform()
-}

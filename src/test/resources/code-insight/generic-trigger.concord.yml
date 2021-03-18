@@ -1,0 +1,8 @@
+triggers:
+  - <error descr="Expected object value"><error descr="Missing required properties on test1: entryPoint, conditions, version">test1:</error></error>
+
+  - test:
+      version: <error descr="Expected `2` value">21</error>
+      conditions:
+        k: v1
+      entryPoint: test

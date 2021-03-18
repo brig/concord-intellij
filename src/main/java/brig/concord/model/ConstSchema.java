@@ -16,7 +16,13 @@ public interface ConstSchema extends Schema {
     default boolean canHandle(String value) {
         switch (valueType()) {
             case STRING:
-                return value.equals(value().toString());
+                return value.equals(value());
+            case INT:
+                try {
+                    return value().equals(Integer.valueOf(value));
+                } catch (Exception e) {
+                    return false;
+                }
             default:
                 throw new IllegalArgumentException("Unknown value type: " + valueType());
         }
@@ -28,7 +34,8 @@ public interface ConstSchema extends Schema {
     }
 
     enum ValueType {
-        STRING
+        STRING,
+        INT
     }
 
     class Builder extends ImmutableConstSchema.Builder {
@@ -36,6 +43,11 @@ public interface ConstSchema extends Schema {
         public Builder value(String value) {
             return super.value(value)
                     .valueType(ValueType.STRING);
+        }
+
+        public Builder value(int value) {
+            return super.value(value)
+                    .valueType(ValueType.INT);
         }
     }
 }

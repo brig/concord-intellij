@@ -177,7 +177,7 @@ public class SchemaMatcherVisitor extends Visitor {
             this.schema = null;
 
             if (element instanceof YAMLScalar) {
-                if (schema.canHandle(getText((YAMLScalar) element))) {
+                if (schema.canHandle(getText((YAMLScalar) element)).ok()) {
                     this.schema = schema;
                 }
             }
@@ -208,7 +208,8 @@ public class SchemaMatcherVisitor extends Visitor {
             }
 
             if (schema.schemaOfAdditionalProperties() != null) {
-                this.visit(Objects.requireNonNull(schema.schemaOfAdditionalProperties()));
+                this.schema = schema;
+//                this.visit(Objects.requireNonNull(schema.schemaOfAdditionalProperties()));
             }
         }
 

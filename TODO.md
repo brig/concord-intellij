@@ -1,9 +1,9 @@
+- common tasks autocomplete (name, input params, out?)
 - replace ConcordCliRunConfigurationForm.SdkComboBox with SdkChooserField; 
 - remote SDK
-- grammar for triggers;
 - grammar for forms;
 - grammar for profiles;
-- show combined yaml in "structure view";
+- show effective concord yaml in "structure view"/or just from context menu;
 - imports;
 - task name autocomplete + dependencies;
 - scrip engine autocomplete + dependencies;

@@ -34,15 +34,25 @@ public class TypeCheckVisitor extends DefaultFailVisitor {
 
     @Override
     protected void visitStringSchema(StringSchema schema) {
+        ValueTypeHandler.Result result = null;
         if (value instanceof YAMLScalar) {
-            return;
+            result = schema.canHandle(((YAMLScalar) value).getTextValue());
+            if (result.ok()) {
+                return;
+            }
         }
 
         String type = schema.customType() != null ? schema.customType() : ValueTypes.STRING;
 
-        annotationHolder.newAnnotation(HighlightSeverity.ERROR,
-                ConcordBundle.message("annotator.type.check.expected.typed.string", type))
-                .create();
+        if (result != null && result.error() != null) {
+            annotationHolder.newAnnotation(HighlightSeverity.ERROR,
+                    ConcordBundle.message("annotator.type.check.expected.typed.string.error", type, result.error()))
+                    .create();
+        } else {
+            annotationHolder.newAnnotation(HighlightSeverity.ERROR,
+                    ConcordBundle.message("annotator.type.check.expected.typed.string", type))
+                    .create();
+        }
     }
 
     @Override
