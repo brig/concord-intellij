@@ -84,24 +84,7 @@ public class SchemaProvider {
                         .build())
                 .required()
                 .build()
-
-//                .property("test-object")
-//                .schema(ObjectSchema.builder()
-//                        .property("test", StringSchema.builder().build(), true)
-//                        .property("test-object1")
-//                        .schema(ArraySchema.withItem(StringSchema.builder().build()).build())
-//                        .required()
-//                        .build()
-//                        .build())
-//                .required()
-//                .build()
-
                 .property("entryPoint", flowName)
-                .property("activeProfiles")
-                .schema(ArraySchema.withItem(profileName)
-                        .description("activeProfiles array descr")
-                        .build())
-                .build()
                 .property("dependencies")
                 .schema(ArraySchema.withItem(StringSchema.builder().build())
                         .description("Process dependencies")
@@ -422,11 +405,18 @@ public class SchemaProvider {
                 .property("github", githubTriggerParams, true)
                 .build();
 
+        StringSchema timezone = StringSchema.builder()
+                .id("timezone")
+                .description("timezone value descr")
+                .customType(ValueTypes.TIMEZONE)
+                .build();
+        register(timezone, new TimezoneCompletionProvider());
+
         Schema cronTriggerParams = ObjectSchema.builder()
                 .property("spec", StringSchema.builder().description("cron value descr").customType("cron").build(), true)
                 .property("entryPoint", flowName, true)
                 .property("activeProfiles", ArraySchema.withItem(profileName).description("activeProfiles array descr").build())
-                .property("timezone", StringSchema.builder().description("timezone value descr").customType("timezone").build())
+                .property("timezone", timezone)
                 .property("exclusive", exclusiveSchema, false)
                 .property("arguments", ObjectSchema.anyObject("arguments desct"), false)
                 .build();

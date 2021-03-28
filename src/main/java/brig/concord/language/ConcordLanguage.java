@@ -9,5 +9,4 @@ public class ConcordLanguage extends Language {
     private ConcordLanguage() {
         super("Concord");
     }
-
 }

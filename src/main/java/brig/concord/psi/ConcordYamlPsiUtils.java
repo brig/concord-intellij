@@ -70,7 +70,6 @@ public final class ConcordYamlPsiUtils {
 
     public static VirtualFile rootConcordYaml(PsiElement element) {
         if (element == null || element.getContainingFile() == null) {
-            ;
             return null;
         }
 
@@ -87,7 +86,7 @@ public final class ConcordYamlPsiUtils {
             return null;
         }
 
-        VirtualFile rootDir = ProjectRootManager.getInstance(element.getProject()).getFileIndex().getContentRootForFile(elementFile);
+        VirtualFile rootDir = FileUtils.getRootYamlDir(element.getProject(), elementFile);
         if (rootDir == null) {
             return null;
         }

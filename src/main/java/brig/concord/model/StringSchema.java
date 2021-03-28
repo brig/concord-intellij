@@ -62,6 +62,7 @@ public interface StringSchema extends Schema {
             Map<String, ValueTypeHandler<String>> m = new HashMap<>();
             m.put(ValueTypes.DURATION, DurationValueHandler.INSTANCE);
             m.put(ValueTypes.REGEXP, RegexpValueHandler.INSTANCE);
+            m.put(ValueTypes.TIMEZONE, TimezoneValueHandler.INSTANCE);
             return m;
         }
     }

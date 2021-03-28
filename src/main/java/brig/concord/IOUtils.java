@@ -12,10 +12,6 @@ public final class IOUtils {
     private IOUtils() {
     }
 
-    public static void main(String[] arsg) {
-
-    }
-
     public static boolean deleteRecursively(Path p) throws IOException {
         if (!Files.exists(p)) {
             return false;

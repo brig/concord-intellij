@@ -13,6 +13,8 @@
     <depends>org.jetbrains.plugins.yaml</depends>
     <depends>com.intellij.modules.java</depends>
 
+    <resource-bundle>messages.ConcordBundle</resource-bundle>
+
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="Concord" implementationClass="brig.concord.language.ConcordFileType"
                   fieldName="INSTANCE" language="yaml"
@@ -55,5 +57,18 @@
                 description="Create a Concord YAML file">
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewFile"/>
         </action>
+
+        <action id="ConcordPlugin.ShowEffectivePom" class="brig.concord.actions.ShowEffectiveYamlAction"/>
+
+        <group id="ConcordPlugin.BaseProjectMenu">
+            <reference id="ConcordPlugin.ShowEffectivePom"/>
+        </group>
+
+        <group id="ConcordPlugin.GlobalProjectMenu" class="brig.concord.actions.ConcordActionGroup" popup="true"
+               icon="/icons/concord.png">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <reference ref="ConcordPlugin.BaseProjectMenu"/>
+        </group>
     </actions>
 </idea-plugin>

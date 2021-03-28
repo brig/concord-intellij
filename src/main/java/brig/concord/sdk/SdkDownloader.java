@@ -1,6 +1,7 @@
 package brig.concord.sdk;
 
 import brig.concord.ConcordBundle;
+import brig.concord.ConcordUtils;
 import brig.concord.language.ConcordIcons;
 import brig.concord.log.Logger;
 import com.intellij.ide.DataManager;
@@ -30,15 +31,6 @@ public class SdkDownloader implements SdkDownload {
 
     private static final Logger log = Logger.getInstance(SdkDownloader.class);
 
-    private static <T> T computeInBackground(Project project, String title, Function<? super ProgressIndicator, ? extends T> task) throws Exception {
-        return ProgressManager.getInstance().run(new Task.WithResult<T, Exception>(project, title, true) {
-            @Override
-            protected T compute(@NotNull ProgressIndicator indicator) {
-                return task.apply(indicator);
-            }
-        });
-    }
-
     @Override
     public boolean supportsDownload(@NotNull SdkTypeId sdkTypeId) {
         return sdkTypeId == ConcordSdkType.getInstance();
@@ -58,7 +50,7 @@ public class SdkDownloader implements SdkDownload {
 
         List<SdkItem> items = Collections.emptyList();
         try {
-            items = computeInBackground(project, ConcordBundle.message("progress.title.downloading.sdk.list"), progressIndicator -> SdkListDownloader.getInstance().downloadForUI(progressIndicator));
+            items = ConcordUtils.computeInBackground(project, ConcordBundle.message("progress.title.downloading.sdk.list"), progressIndicator -> SdkListDownloader.getInstance().downloadForUI(progressIndicator));
         } catch (Throwable e) {
             log.warn("Failed to download the list of SDKs. {}", e);
         }
@@ -83,7 +75,7 @@ public class SdkDownloader implements SdkDownload {
 
         SdkInstaller.PendingSdkRequest request;
         try {
-            request = computeInBackground(project, ConcordBundle.message("progress.title.preparing.sdk"),
+            request = ConcordUtils.computeInBackground(project, ConcordBundle.message("progress.title.preparing.sdk"),
                     progressIndicator -> SdkInstaller.getInstance().prepareSdkInstallation(result.getFirst(), result.getSecond()));
         } catch (Throwable t) {
             log.warn("Failed to prepare SDK installation to {}", result.getSecond(), t);

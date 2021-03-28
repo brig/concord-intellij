@@ -52,6 +52,11 @@ public class Logger {
         delegate.warn(msg);
     }
 
+    public void error(String format, Object... args) {
+        String msg = formatMessage(LogLevel.ERROR, format, args);
+        delegate.warn(msg);
+    }
+
     private enum LogLevel {
         DEBUG,
         INFO,

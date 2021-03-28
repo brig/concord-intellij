@@ -1,5 +1,7 @@
+- replace concord-cli with impl in a plugin;
+- run from effective yaml (not working now)?
 - common tasks autocomplete (name, input params, out?)
-- replace ConcordCliRunConfigurationForm.SdkComboBox with SdkChooserField; 
+- replace ConcordCliRunConfigurationForm.SdkComboBox with SdkChooserField?; 
 - remote SDK
 - grammar for forms;
 - grammar for profiles;
